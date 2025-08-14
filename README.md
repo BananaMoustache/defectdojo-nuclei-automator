@@ -1,4 +1,4 @@
-## DefectDojo Nuclei Automator
+### DefectDojo Nuclei Automator
 
 **Skrip Python untuk otomatisasi alur kerja keamanan aplikasi** — menjalankan pemindaian kerentanan menggunakan **[Nuclei](https://github.com/projectdiscovery/nuclei)** dan langsung mengunggah hasilnya ke **[DefectDojo](https://github.com/DefectDojo/django-DefectDojo)** untuk pelacakan serta manajemen.
 
@@ -8,9 +8,6 @@
   <img src="https://cloud.defectdojo.com/static/daas/images/defectdojologo.png" width="150" alt="DefectDojo Logo">
 </div>
 
----
-
-## Fitur Utama
 
 - Scan & laporkan ke DefectDojo dengan satu perintah.
 - Cek otomatis apakah Product sudah ada, jika belum skrip membuatnya.
@@ -41,3 +38,42 @@
  │  Laporan Dibuat   │
  │ (Temuan diimpor)  │
  └───────────────────┘
+
+```
+
+---
+
+## Prasyarat
+> Python ≥ 3.6 , Git, Nuclei (pastikan dapat diakses dari terminal)
+
+---
+
+## Instalasi & Konfigurasi
+
+- Clone Repositori
+```text
+git clone https://github.com/BananaMoustache/defectdojo-nuclei-automator
+cd defectdojo-nuclei-automator
+```
+
+- Konfigurasi Variabel
+Edit main.py:
+```text
+# URL instance DefectDojo (akhiri dengan /api/v2)
+DEFECTDOJO_URL = "https://defectdojo.example.com/api/v2"
+
+# Token API DefectDojo
+API_KEY = "TOKEN_API_DEFECTDOJO"
+
+# Direktori penyimpanan hasil scan sementara (opsional)
+output_dir = "scan_results"
+```
+
+## Run Script
+```text
+python main.py
+```
+
+Skrip akan meminta:
+- Nama Product di DefectDojo
+- URL Target untuk dipindai oleh Nuclei
