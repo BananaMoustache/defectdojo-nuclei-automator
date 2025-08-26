@@ -6,7 +6,7 @@ import shutil
 import argparse
 import requests
 
-from .config import DEFECTDOJO_URL, API_KEY, DEFAULT_OUT_DIR
+from .config import DEFECTDOJO_URL, API_KEY, DEFAULT_OUT_DIR, SCAN_PROFILES
 from .utils import (
     now_str,
     slugify,
@@ -38,9 +38,18 @@ def handle_import_for_hostfile(dd_url: str, token: str, host: str, host_file: st
     print(f"[OK] Upload '{product_name}' (findings: {findings})")
 
 
+def _profile_params(profile_name: str):
+    p = SCAN_PROFILES.get(profile_name or "default", SCAN_PROFILES["default"])
+    return (
+        p.get("include_tags"),
+        p.get("exclude_tags"),
+        p.get("exclude_templates"),
+    )
+
 def run_mode_list(args: argparse.Namespace):
     dd_url = args.dd_url or DEFECTDOJO_URL
     token = args.dd_token or API_KEY
+    include_tags, exclude_tags, exclude_templates = _profile_params(args.scan_profile)
     if not token:
         raise SystemExit("[!] DD token is required. Use --dd-token or ENV DD_TOKEN.")
 
@@ -48,7 +57,13 @@ def run_mode_list(args: argparse.Namespace):
     os.makedirs(out_dir, exist_ok=True)
 
     # Run nuclei -list (with optional severity)
-    tmp_json = nuclei_list(args.targets, severity=args.severity)
+    tmp_json = nuclei_list(
+        args.targets,
+        severity=args.severity,
+        include_tags=include_tags,
+        exclude_tags=exclude_tags,
+        exclude_templates=exclude_templates,
+    )
 
     # Split per-host (JSON array per host)
     host_files = split_by_host_to_json_arrays(tmp_json, out_dir)
@@ -89,6 +104,7 @@ def run_mode_list(args: argparse.Namespace):
 def run_mode_single(args: argparse.Namespace):
     dd_url = args.dd_url or DEFECTDOJO_URL
     token = args.dd_token or API_KEY
+    include_tags, exclude_tags, exclude_templates = _profile_params(args.scan_profile)
     if not token:
         raise SystemExit("[!] DD token is required. Use --dd-token or ENV DD_TOKEN.")
 
@@ -101,7 +117,13 @@ def run_mode_single(args: argparse.Namespace):
 
     print(f"\n[+] Starting single-target scan: {target}")
     try:
-        tmp_json = nuclei_single(target, severity=args.severity)
+        tmp_json = nuclei_single(
+            target,
+            severity=args.severity,
+            include_tags=include_tags,            
+            exclude_tags=exclude_tags,            
+            exclude_templates=exclude_templates,
+        )
 
         host = product_name_from_target(target)
         safe_host = slugify(host)

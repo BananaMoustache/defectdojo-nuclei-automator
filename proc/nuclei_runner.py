@@ -14,12 +14,14 @@ def ensure_nuclei():
             "Nuclei not found in PATH. Ensure it can be executed as 'nuclei'."
         )
 
-
 def nuclei_single(
     url: str,
     json_export_path: Optional[str] = None,
     timeout_sec: int = 1800,
     severity: Optional[str] = None,
+    include_tags: Optional[str] = None,
+    exclude_tags: Optional[str] = None,
+    exclude_templates: Optional[list] = None 
 ) -> str:
     """
     Run nuclei -u <url> [-severity <sev>] -json-export <path>
@@ -33,6 +35,14 @@ def nuclei_single(
     cmd = ["nuclei", "-u", url, "-json-export", json_export_path]
     if severity:
         cmd.extend(["-severity", severity])  # equivalent to -s info intent
+    if include_tags:
+        cmd.extend(["-tags", include_tags])               
+    if exclude_tags:
+        cmd.extend(["-exclude-tags", exclude_tags])      
+    if exclude_templates:
+        for et in exclude_templates:                        
+            cmd.extend(["-exclude-templates", et])
+    
     print(f"[+] Nuclei single: {' '.join(cmd)}")
     subprocess.run(cmd, check=True, timeout=timeout_sec)
     return json_export_path
@@ -43,6 +53,9 @@ def nuclei_list(
     json_export_path: Optional[str] = None,
     timeout_sec: int = 3600,
     severity: Optional[str] = None,
+    include_tags: Optional[str] = None,    
+    exclude_tags: Optional[str] = None,    
+    exclude_templates: Optional[list] = None 
 ) -> str:
     """
     Run nuclei -list <file> [-severity <sev>] -json-export <path>
@@ -55,6 +68,13 @@ def nuclei_list(
     cmd = ["nuclei", "-list", list_file, "-json-export", json_export_path]
     if severity:
         cmd.extend(["-severity", severity])
+    if include_tags:
+        cmd.extend(["-tags", include_tags])            
+    if exclude_tags:
+        cmd.extend(["-exclude-tags", exclude_tags])        
+    if exclude_templates:
+        for et in exclude_templates:                      
+            cmd.extend(["-exclude-templates", et])
     print(f"[+] Nuclei list: {' '.join(cmd)}")
     subprocess.run(cmd, check=True, timeout=timeout_sec)
     return json_export_path

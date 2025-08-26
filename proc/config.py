@@ -19,6 +19,25 @@ API_KEY = os.environ.get("DD_TOKEN", "")
 PROD_TYPE_NAME = os.environ.get("DD_PROD_TYPE_NAME", "Research and Development")
 PROD_TYPE_ID_ENV = os.environ.get("DD_PROD_TYPE_ID")  # optional int
 
+# [ADD] di bagian bawah file, setelah konstanta yang sudah ada
+
+# Profil scan: 'asm' (Attack Surface Monitoring) vs 'default' (full templates)
+ASM_INCLUDE_TAGS = "exposure,misconfig,panel,default-login,tech,fingerprint,cve,takeover,web"
+ASM_EXCLUDE_TAGS = "fuzz,dos,bruteforce,network"
+ASM_EXCLUDE_TEMPLATES = ["http/fuzzing/", "network/", "dns/"]
+
+SCAN_PROFILES = {
+    "default": { 
+        "include_tags": None,
+        "exclude_tags": None,
+        "exclude_templates": None,
+    },
+    "asm": {
+        "include_tags": ASM_INCLUDE_TAGS,
+        "exclude_tags": ASM_EXCLUDE_TAGS,
+        "exclude_templates": ASM_EXCLUDE_TEMPLATES,
+    },
+}
 
 def HEADERS_JSON(token: str):
     return {

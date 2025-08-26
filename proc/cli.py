@@ -5,7 +5,6 @@ import os
 import argparse
 from .config import DEFAULT_OUT_DIR
 
-
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Nuclei → DefectDojo Automator (modes: list, single)",
@@ -39,5 +38,11 @@ def build_parser() -> argparse.ArgumentParser:
         "-s",
         "--severity",
         help="Nuclei severity filter (e.g. 'info' or 'low,medium,high,critical').",
+    )
+    p.add_argument(
+        "--scan-profile",
+        choices=["default", "asm"],
+        default="default",
+        help="Scan profile: 'asm' utilizing dedicated tags/exclude for ASM, 'default' = full templates.",
     )
     return p
