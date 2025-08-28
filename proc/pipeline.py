@@ -5,6 +5,7 @@ import os
 import shutil
 import argparse
 import requests
+import subprocess
 
 from .config import DEFECTDOJO_URL, API_KEY, DEFAULT_OUT_DIR, SCAN_PROFILES
 from .utils import (
@@ -22,8 +23,10 @@ from .dojo_client import (
     extract_findings_count,
 )
 
+
 def product_name_from_target(target: str) -> str:
     return canonical_host_from_any(target)
+
 
 def handle_import_for_hostfile(dd_url: str, token: str, host: str, host_file: str):
     product_name = host
@@ -44,7 +47,16 @@ def _profile_params(profile_name: str):
         p.get("exclude_templates"),
     )
 
+
+def _maybe_update_templates(args):
+    if getattr(args, "update_templates", False):
+        print("[INF] Updating nuclei templates (nuclei -ut)...")
+        subprocess.run(["nuclei", "-ut"], check=True)
+        print("[INF] Nuclei templates update completed.")
+
+
 def run_mode_list(args: argparse.Namespace):
+    _maybe_update_templates(args)
     dd_url = args.dd_url or DEFECTDOJO_URL
     token = args.dd_token or API_KEY
     include_tags, exclude_tags, exclude_templates = _profile_params(args.scan_profile)
@@ -96,7 +108,9 @@ def run_mode_list(args: argparse.Namespace):
                     pass
     print(f"[=] Done: {success}/{total} hosts uploaded.")
 
+
 def run_mode_single(args: argparse.Namespace):
+    _maybe_update_templates(args)
     dd_url = args.dd_url or DEFECTDOJO_URL
     token = args.dd_token or API_KEY
     include_tags, exclude_tags, exclude_templates = _profile_params(args.scan_profile)
@@ -115,8 +129,8 @@ def run_mode_single(args: argparse.Namespace):
         tmp_json = nuclei_single(
             target,
             severity=args.severity,
-            include_tags=include_tags,            
-            exclude_tags=exclude_tags,            
+            include_tags=include_tags,
+            exclude_tags=exclude_tags,
             exclude_templates=exclude_templates,
             rate_limit=args.rate_limit,
             concurrency=args.concurrency,

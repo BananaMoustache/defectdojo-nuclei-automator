@@ -5,6 +5,7 @@ import os
 import argparse
 from .config import DEFAULT_OUT_DIR
 
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Nuclei → DefectDojo Automator (modes: list, single)",
@@ -46,13 +47,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Scan profile: 'asm' utilizing dedicated tags/exclude for ASM, 'default' = full templates.",
     )
     p.add_argument(
-        "-rl", "--rate-limit",
+        "-rl",
+        "--rate-limit",
         type=int,
-        help="Limit on requests per second for Nuclei (example: 120)."
+        help="Limit on requests per second for Nuclei (example: 120).",
     )
     p.add_argument(
-        "-c", "--concurrency",
+        "-c",
+        "--concurrency",
         type=int,
-        help="Number of worker concurrency for Nuclei (example: 80)."
+        help="Number of worker concurrency for Nuclei (example: 80).",
+    )
+    p.add_argument(
+        "-ut",
+        "--update-templates",
+        action="store_true",
+        help="Run ‘nuclei -ut’ before the scan begins.",
     )
     return p
