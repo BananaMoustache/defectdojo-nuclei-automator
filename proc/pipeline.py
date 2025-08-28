@@ -22,10 +22,8 @@ from .dojo_client import (
     extract_findings_count,
 )
 
-
 def product_name_from_target(target: str) -> str:
     return canonical_host_from_any(target)
-
 
 def handle_import_for_hostfile(dd_url: str, token: str, host: str, host_file: str):
     product_name = host
@@ -56,19 +54,18 @@ def run_mode_list(args: argparse.Namespace):
     out_dir = args.out_dir or str(DEFAULT_OUT_DIR)
     os.makedirs(out_dir, exist_ok=True)
 
-    # Run nuclei -list (with optional severity)
     tmp_json = nuclei_list(
         args.targets,
         severity=args.severity,
         include_tags=include_tags,
         exclude_tags=exclude_tags,
         exclude_templates=exclude_templates,
+        rate_limit=args.rate_limit,
+        concurrency=args.concurrency,
     )
 
-    # Split per-host (JSON array per host)
     host_files = split_by_host_to_json_arrays(tmp_json, out_dir)
 
-    # keep combined JSON if requested
     if args.save_json:
         ts = now_str()
         final_json = os.path.join(out_dir, f"nuclei_list_{ts}.json")
@@ -80,7 +77,6 @@ def run_mode_list(args: argparse.Namespace):
     except Exception:
         pass
 
-    # upload per-host
     success, total = 0, len(host_files)
     for host, fp in host_files.items():
         try:
@@ -99,7 +95,6 @@ def run_mode_list(args: argparse.Namespace):
                 except Exception:
                     pass
     print(f"[=] Done: {success}/{total} hosts uploaded.")
-
 
 def run_mode_single(args: argparse.Namespace):
     dd_url = args.dd_url or DEFECTDOJO_URL
@@ -123,6 +118,8 @@ def run_mode_single(args: argparse.Namespace):
             include_tags=include_tags,            
             exclude_tags=exclude_tags,            
             exclude_templates=exclude_templates,
+            rate_limit=args.rate_limit,
+            concurrency=args.concurrency,
         )
 
         host = product_name_from_target(target)

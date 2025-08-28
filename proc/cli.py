@@ -45,4 +45,14 @@ def build_parser() -> argparse.ArgumentParser:
         default="default",
         help="Scan profile: 'asm' utilizing dedicated tags/exclude for ASM, 'default' = full templates.",
     )
+    p.add_argument(
+        "-rl", "--rate-limit",
+        type=int,
+        help="Limit on requests per second for Nuclei (example: 120)."
+    )
+    p.add_argument(
+        "-c", "--concurrency",
+        type=int,
+        help="Number of worker concurrency for Nuclei (example: 80)."
+    )
     return p

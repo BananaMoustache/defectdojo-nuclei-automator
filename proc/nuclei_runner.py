@@ -21,7 +21,9 @@ def nuclei_single(
     severity: Optional[str] = None,
     include_tags: Optional[str] = None,
     exclude_tags: Optional[str] = None,
-    exclude_templates: Optional[list] = None 
+    exclude_templates: Optional[list] = None,
+    rate_limit: Optional[int] = None,
+    concurrency: Optional[int] = None, 
 ) -> str:
     """
     Run nuclei -u <url> [-severity <sev>] -json-export <path>
@@ -34,7 +36,7 @@ def nuclei_single(
         )
     cmd = ["nuclei", "-u", url, "-json-export", json_export_path]
     if severity:
-        cmd.extend(["-severity", severity])  # equivalent to -s info intent
+        cmd.extend(["-severity", severity])
     if include_tags:
         cmd.extend(["-tags", include_tags])               
     if exclude_tags:
@@ -42,6 +44,11 @@ def nuclei_single(
     if exclude_templates:
         for et in exclude_templates:                        
             cmd.extend(["-exclude-templates", et])
+    if rate_limit:
+        cmd.extend(["-rl", str(rate_limit)])
+    if concurrency:
+        cmd.extend(["-c", str(concurrency)])
+
     
     print(f"[+] Nuclei single: {' '.join(cmd)}")
     subprocess.run(cmd, check=True, timeout=timeout_sec)
@@ -55,7 +62,9 @@ def nuclei_list(
     severity: Optional[str] = None,
     include_tags: Optional[str] = None,    
     exclude_tags: Optional[str] = None,    
-    exclude_templates: Optional[list] = None 
+    exclude_templates: Optional[list] = None,
+    rate_limit: Optional[int] = None,
+    concurrency: Optional[int] = None,
 ) -> str:
     """
     Run nuclei -list <file> [-severity <sev>] -json-export <path>
@@ -66,6 +75,7 @@ def nuclei_list(
             f"{tempfile.gettempdir()}/nuclei_list_{uuid.uuid4().hex}.json"
         )
     cmd = ["nuclei", "-list", list_file, "-json-export", json_export_path]
+
     if severity:
         cmd.extend(["-severity", severity])
     if include_tags:
@@ -75,6 +85,11 @@ def nuclei_list(
     if exclude_templates:
         for et in exclude_templates:                      
             cmd.extend(["-exclude-templates", et])
+    if rate_limit:
+        cmd.extend(["-rl", str(rate_limit)])
+    if concurrency:
+        cmd.extend(["-c", str(concurrency)])
+
     print(f"[+] Nuclei list: {' '.join(cmd)}")
     subprocess.run(cmd, check=True, timeout=timeout_sec)
     return json_export_path
