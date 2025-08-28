@@ -3,6 +3,9 @@
 
 from proc.cli import build_parser
 from proc.pipeline import run_mode_list, run_mode_single
+from proc.utils import show_banner
+
+show_banner(title_line="Nuclei2Dojo", ascii_only=False)
 
 
 def main():

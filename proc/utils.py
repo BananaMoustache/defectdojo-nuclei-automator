@@ -10,6 +10,21 @@ from urllib.parse import urlparse
 from typing import Dict, List, Iterable
 
 
+def show_banner(title_line: str = "Nuclei2Dojo", ascii_only: bool = False) -> None:
+    art = r"""
+   _  __         __    _ ___  ___         _    
+  / |/ /_ ______/ /__ (_)_  |/ _ \___    (_)__ 
+ /    / // / __/ / -_) / __// // / _ \  / / _ \
+/_/|_/\_,_/\__/_/\__/_/____/____/\___/_/ /\___/
+                                    |___/      
+"""
+    sep = ("─" * 76) if not ascii_only else ("-" * 76)
+    print("\n" + art.rstrip())
+    print(sep)
+    print(f"{title_line}")
+    print(sep + "\n")
+
+
 def now_str() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
